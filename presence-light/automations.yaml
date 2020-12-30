@@ -1,0 +1,17 @@
+- alias: "Gæstebadeværelse: Tænd lys ved bevægelse"
+  use_blueprint:
+    path: krf/presence_light.yaml
+    input:
+      motion_entity: binary_sensor.guestbathroom_presence
+      light_target:
+        entity_id:
+          - light.guestbathroom_ceiling
+          - light.guestbathroom_under_sink
+      timer_entity:
+        entity_id: input_number.guestbathroom_presence_timer
+      active_entity:
+        entity_id: input_boolean.guestbathroom_presence_active
+      active_after_entity:
+        entity_id: input_datetime.guestbathroom_presence_active_after
+      active_before_entity:
+        entity_id: input_datetime.guestbathroom_presence_active_before

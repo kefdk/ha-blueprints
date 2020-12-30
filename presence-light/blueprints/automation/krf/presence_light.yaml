@@ -1,0 +1,71 @@
+blueprint:
+  name: Activate Light on Motion
+  description: Turn on light when motion is detected.
+  domain: automation
+  input:
+    motion_entity:
+      name: Bevægelsessensor
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+    light_target:
+      name: Lys
+      selector:
+        target:
+          entity:
+            domain: light
+    timer_entity:
+      name: Timer
+      selector:
+        entity:
+          domain: input_number
+    active_entity:
+      name: Aktiv
+      selector:
+        entity:
+          domain: input_boolean
+    active_after_entity:
+      name: Aktiv fra kl.
+      selector:
+        entity:
+          domain: input_datetime
+    active_before_entity:
+      name: Aktiv til kl.
+      selector:
+        entity:
+          domain: input_datetime
+
+# If motion is detected within the delay,
+# we restart the script.
+mode: restart
+max_exceeded: silent
+
+trigger:
+  platform: state
+  entity_id: !input motion_entity
+  from: "off"
+  to: "on"
+
+condition:
+  condition: and
+  conditions:
+    - condition: state
+      entity_id: !input active_entity
+      state: "on"
+    - condition: time
+      after: !input active_after_entity
+    - condition: time
+      before: !input active_before_entity
+
+action:
+  - service: light.turn_on
+    target: !input light_target
+  - wait_for_trigger:
+      platform: state
+      entity_id: !input motion_entity
+      from: "on"
+      to: "off"
+  - delay: !input timer_entity
+  - service: light.turn_off
+    target: !input light_target
